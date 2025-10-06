@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .course-card.completed {
+            border: 3px solid #10b981;
+        }
+
+        .course-title {
+            color: #333;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .course-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .lesson-count {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .completed-badge {
+            background: #10b981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .course-detail {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .detail-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .lessons-list {
+            margin: 30px 0;
+        }
+
+        .lesson-item {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .lesson-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .lesson-duration {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .action-btn.completed-btn {
+            background: #10b981;
+        }
+
+        .action-btn.completed-btn:hover {
+            background: #059669;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 E-Learning Platform</h1>
+            <button class="nav-btn hidden" id="backBtn">← Back to Courses</button>
+        </header>
+
+        <div id="homePage">
+            <div class="courses-grid" id="coursesGrid"></div>
+        </div>
+
+        <div id="detailPage" class="hidden"></div>
+    </div>
+
+    <script>
+        // Course data
+        const coursesData = [
+            {
+                id: 1,
+                title: "Web Development Fundamentals",
+                description: "Learn the basics of HTML, CSS, and JavaScript to build modern websites.",
+                lessons: [
+                    { title: "Introduction to HTML", duration: "30 min" },
+                    { title: "CSS Styling Basics", duration: "45 min" },
+                    { title: "JavaScript Fundamentals", duration: "60 min" },
+                    { title: "Responsive Design", duration: "40 min" },
+                    { title: "Building Your First Website", duration: "90 min" }
+                ],
+                completed: false
+            },
+            {
+                id: 2,
+                title: "Python Programming",
+                description: "Master Python from basics to advanced concepts including data structures and OOP.",
+                lessons: [
+                    { title: "Python Syntax and Variables", duration: "35 min" },
+                    { title: "Control Flow and Loops", duration: "40 min" },
+                    { title: "Functions and Modules", duration: "50 min" },
+                    { title: "Object-Oriented Programming", duration: "70 min" },
+                    { title: "Working with Files", duration: "45 min" }
+                ],
+                completed: false
+            },
+            {
+                id: 3,
+                title: "Digital Marketing Essentials",
+                description: "Discover strategies for SEO, social media marketing, and content creation.",
+                lessons: [
+                    { title: "Introduction to Digital Marketing", duration: "25 min" },
+                    { title: "SEO Fundamentals", duration: "55 min" },
+                    { title: "Social Media Strategy", duration: "60 min" },
+                    { title: "Content Marketing", duration: "50 min" },
+                    { title: "Analytics and Metrics", duration: "40 min" }
+                ],
+                completed: false
+            },
+            {
+                id: 4,
+                title: "Data Science Basics",
+                description: "Introduction to data analysis, visualization, and basic machine learning concepts.",
+                lessons: [
+                    { title: "Introduction to Data Science", duration: "30 min" },
+                    { title: "Data Cleaning and Preparation", duration: "55 min" },
+                    { title: "Data Visualization", duration: "45 min" },
+                    { title: "Statistical Analysis", duration: "65 min" },
+                    { title: "Introduction to Machine Learning", duration: "75 min" }
+                ],
+                completed: false
+            },
+            {
+                id: 5,
+                title: "UI/UX Design Principles",
+                description: "Learn the fundamentals of user interface and user experience design.",
+                lessons: [
+                    { title: "Design Thinking Basics", duration: "35 min" },
+                    { title: "User Research Methods", duration: "50 min" },
+                    { title: "Wireframing and Prototyping", duration: "60 min" },
+                    { title: "Visual Design Principles", duration: "55 min" },
+                    { title: "Usability Testing", duration: "45 min" }
+                ],
+                completed: false
+            },
+            {
+                id: 6,
+                title: "Cloud Computing Fundamentals",
+                description: "Understand cloud services, deployment models, and major cloud platforms.",
+                lessons: [
+                    { title: "Introduction to Cloud Computing", duration: "30 min" },
+                    { title: "Cloud Service Models", duration: "40 min" },
+                    { title: "Cloud Deployment Strategies", duration: "50 min" },
+                    { title: "Security in the Cloud", duration: "55 min" },
+                    { title: "Hands-on with Cloud Platforms", duration: "80 min" }
+                ],
+                completed: false
+            }
+        ];
+
+        // State
+        let courses = [...coursesData];
+        let currentCourseId = null;
+
+        // DOM elements
+        const homePage = document.getElementById('homePage');
+        const detailPage = document.getElementById('detailPage');
+        const coursesGrid = document.getElementById('coursesGrid');
+        const backBtn = document.getElementById('backBtn');
+
+        // Initialize
+        function init() {
+            renderCourses();
+            backBtn.addEventListener('click', showHomePage);
+        }
+
+        // Render courses grid
+        function renderCourses() {
+            coursesGrid.innerHTML = '';
+            courses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = `course-card ${course.completed ? 'completed' : ''}`;
+                courseCard.onclick = () => showCourseDetail(course.id);
+                
+                courseCard.innerHTML = `
+                    <h2 class="course-title">${course.title}</h2>
+                    <p class="course-description">${course.description}</p>
+                    <div class="course-meta">
+                        <span class="lesson-count">${course.lessons.length} Lessons</span>
+                        ${course.completed ? '<span class="completed-badge">✓ Completed</span>' : ''}
+                    </div>
+                `;
+                
+                coursesGrid.appendChild(courseCard);
+            });
+        }
+
+        // Show course detail
+        function showCourseDetail(courseId) {
+            currentCourseId = courseId;
+            const course = courses.find(c => c.id === courseId);
+            
+            const totalDuration = course.lessons.reduce((acc, lesson) => {
+                const mins = parseInt(lesson.duration);
+                return acc + mins;
+            }, 0);
+
+            detailPage.innerHTML = `
+                <div class="course-detail">
+                    <div class="detail-header">
+                        <h2 class="course-title">${course.title}</h2>
+                        <p class="course-description">${course.description}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${course.completed ? '100%' : '0%'}"></div>
+                        </div>
+                        <p class="progress-text">Progress: ${course.completed ? '100' : '0'}% Complete</p>
+                    </div>
+                    
+                    <h3>Course Content</h3>
+                    <div class="lessons-list">
+                        ${course.lessons.map((lesson, index) => `
+                            <div class="lesson-item">
+                                <div class="lesson-title">${index + 1}. ${lesson.title}</div>
+                                <div class="lesson-duration">⏱ ${lesson.duration}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <p style="color: #666; margin: 20px 0;">
+                        <strong>Total Duration:</strong> ${totalDuration} minutes
+                    </p>
+                    
+                    <button class="action-btn ${course.completed ? 'completed-btn' : ''}" onclick="toggleCourseCompletion()">
+                        ${course.completed ? '✓ Completed' : 'Mark as Complete'}
+                    </button>
+                </div>
+            `;
+            
+            homePage.classList.add('hidden');
+            detailPage.classList.remove('hidden');
+            backBtn.classList.remove('hidden');
+        }
+
+        // Show home page
+        function showHomePage() {
+            homePage.classList.remove('hidden');
+            detailPage.classList.add('hidden');
+            backBtn.classList.add('hidden');
+            currentCourseId = null;
+        }
+
+        // Toggle course completion
+        function toggleCourseCompletion() {
+            const course = courses.find(c => c.id === currentCourseId);
+            course.completed = !course.completed;
+            showCourseDetail(currentCourseId);
+            renderCourses();
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
